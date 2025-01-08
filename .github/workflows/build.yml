@@ -72,7 +72,7 @@ jobs:
           distribution: 'temurin'
           java-version: '23'
           cache: gradle
-
+          
       - name: Make Gradlew executable
         run: chmod +x gradlew
 
