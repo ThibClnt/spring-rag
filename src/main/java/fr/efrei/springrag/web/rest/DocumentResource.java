@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 public class DocumentResource {
 
-
     private static final Logger log = LoggerFactory.getLogger(DocumentResource.class);
     private final DocumentService documentService;
 
@@ -64,5 +63,10 @@ public class DocumentResource {
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/documents/chat2/{user}")
+    public String chat2(@RequestBody String query, @PathVariable String user) throws InterruptedException {
+        return documentService.chat(query);
     }
 }
