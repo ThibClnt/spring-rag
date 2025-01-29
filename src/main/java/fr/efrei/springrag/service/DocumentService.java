@@ -2,7 +2,8 @@ package fr.efrei.springrag.service;
 
 import fr.efrei.springrag.domain.Document;
 import fr.efrei.springrag.repository.DocumentRepository;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,8 @@ import java.util.List;
 @Service
 public class DocumentService {
 
+    private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
     private final DocumentRepository documentRepository;
-
-    private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(DocumentService.class);
 
     public DocumentService(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
