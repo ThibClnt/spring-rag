@@ -51,12 +51,18 @@ public class DocumentService {
     private final InMemoryEmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
     private final ChatLanguageModel chatLanguageModel;
+    private final EmbeddingStoreIngestor ingestor;
 
     public DocumentService(DocumentRepository documentRepository, InMemoryEmbeddingStore<TextSegment> embeddingStore, EmbeddingModel embeddingModel, ChatLanguageModel chatLanguageModel) {
         this.documentRepository = documentRepository;
         this.embeddingStore = embeddingStore;
         this.embeddingModel = embeddingModel;
         this.chatLanguageModel = chatLanguageModel;
+        this.ingestor = EmbeddingStoreIngestor.builder()
+                .documentSplitter(new DocumentByLineSplitter(1000, 200))
+                .embeddingModel(embeddingModel)
+                .embeddingStore(embeddingStore)
+                .build();
     }
 
     public List<Document> findAll() {
@@ -66,6 +72,7 @@ public class DocumentService {
 
     public Document buildAndSave(Document document) {
         log.debug("Request to buildAndSave Document : {}", document);
+        ingestDocument(document);
         return documentRepository.save(document);
     }
 
@@ -90,15 +97,13 @@ public class DocumentService {
         Page<Document> documentsPage = documentRepository.findAll(pageable);
         if (documentsPage.hasContent()) {
             String documentsAsJson = convertListToJson(documentsPage.getContent());
-
-            EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-                    .documentSplitter(new DocumentByLineSplitter(1000, 200))
-                    .embeddingModel(embeddingModel)
-                    .embeddingStore(embeddingStore)
-                    .build();
-
-            ingestor.ingest(new dev.langchain4j.data.document.Document(documentsAsJson));
+            this.ingestor.ingest(new dev.langchain4j.data.document.Document(documentsAsJson));
         }
+    }
+
+    public void ingestDocument(Document document) {
+        String documentAsJson = convertListToJson(List.of(document));
+        this.ingestor.ingest(new dev.langchain4j.data.document.Document(documentAsJson));
     }
 
     public String convertListToJson(List<Document> documents) {
