@@ -109,7 +109,7 @@ jobs:
 
       - name: Deploy the image to minikube
         run: |
-          docker pull filliolaud/spring-rag:latest
+          docker pull erkstone/spring-rag:latest
           kubectl apply -f src/main/k8s/deployment.yml
 
       - name: Get Kubernetes service URL
